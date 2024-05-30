@@ -1,16 +1,3 @@
 # app_final_alexm
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Un proyecto de flutter en el que hacemos unas consultas a la api de https://openweathermap.org/ y mostramos segun la latitud y longitud del lugar que pongamos pues los datos sobre el tiempo que hace en estos momentos por alli con sus datos mas relevantes como seria la temperatura, la humedad, el viento que hace etc.
