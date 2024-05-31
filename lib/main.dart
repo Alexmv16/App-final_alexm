@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:app_final_alexm/database_helper.dart';
 import 'package:app_final_alexm/weather_service.dart';
+import 'package:app_final_alexm/geocoding_service.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de inicializar el binding de widgets
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize sqflite FFI
   sqfliteFfiInit();
@@ -34,9 +35,9 @@ class WeatherHomePage extends StatefulWidget {
 
 class _WeatherHomePageState extends State<WeatherHomePage> {
   final WeatherService _weatherService = WeatherService();
+  final GeocodingService _geocodingService = GeocodingService();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
-  double? _latitud;
-  double? _longitud;
+  String? _ciudad;
   Map<String, dynamic>? _datosMeteorologicos;
   List<Map<String, dynamic>> _weatherRecords = [];
 
@@ -59,11 +60,12 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       try {
-        final data = await _weatherService.fetchWeather(_latitud!, _longitud!);
+        final coordinates = await _geocodingService.getCoordinates(_ciudad!);
+        final data = await _weatherService.fetchWeather(coordinates['lat']!, coordinates['lon']!);
         setState(() {
           _datosMeteorologicos = data;
         });
-        await _databaseHelper.insertWeather(_latitud!, _longitud!, data.toString());
+        await _databaseHelper.insertWeather(coordinates['lat']!, coordinates['lon']!, data.toString());
         await _loadWeatherRecords();  // Recargar los registros después de insertar uno nuevo
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
@@ -88,29 +90,13 @@ class _WeatherHomePageState extends State<WeatherHomePage> {
                 children: [
                   TextFormField(
                     decoration: InputDecoration(
-                      labelText: 'Latitud',
+                      labelText: 'Ciudad',
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: TextInputType.number,
-                    onSaved: (value) => _latitud = double.tryParse(value!),
+                    onSaved: (value) => _ciudad = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Por favor, introduce una latitud';
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Longitud',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    onSaved: (value) => _longitud = double.tryParse(value!),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, introduce una longitud';
+                        return 'Por favor, introduce una ciudad';
                       }
                       return null;
                     },
