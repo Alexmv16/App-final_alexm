@@ -5,13 +5,16 @@ class WeatherService {
   final String apiKey = 'a975f1f1dd5bc78dd422f6875d36cc09';
   final String baseUrl = 'https://api.openweathermap.org/data/3.0/onecall';
 
+  //Esta clase obtiene los datos meteorológicos de la ubicación específica 
+  //usando la API de Openweathermap.
+
  Future<Map<String, dynamic>> fetchWeather(double lat, double lon) async {
     final response = await http.get(Uri.parse('$baseUrl?lat=$lat&lon=$lon&appid=$apiKey'));
 
     if (response.statusCode == 200) {
       Map<String, dynamic> data = json.decode(response.body);
       
-      // Convertir temperatura de Kelvin a Celsius
+      // Convertimos la temperatura de Kelvin a Celsius
       double tempInCelsius = data['current']['temp'] - 273.15;
       double feelsLikeInCelsius = data['current']['feels_like'] - 273.15;
       
